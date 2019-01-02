@@ -17,7 +17,6 @@ export default class Maptalks extends React.Component{
             showmap: false
         };
         this.handleChange = this._handleChange.bind(this);
-        this.getColor = this._getColor.bind(this);
     }
 
     render(){
@@ -30,9 +29,9 @@ export default class Maptalks extends React.Component{
                         this.handleChange()
                     }}
                 >
-                    显示mapbox地图
+                    显示maptalks地图
                 </Checkbox>
-                <div id="maptalks-container" style={{width: '100%',height:'400px'}}>
+                <div id="maptalks-container" style={{width: '470px',height:'370px'}}>
                 </div>
             </div>
         )
@@ -43,12 +42,14 @@ export default class Maptalks extends React.Component{
         if(!this.state.showmap){
             const map = new maptalks.Map('maptalks-container', {
                 center: [-123.10, 49.25],
-                zoom: 10,
+                zoom: 13,
+                pitch : 70,
+                bearing : 180,
                 centerCross : true,
                 doubleClickZoom : false,
                 baseLayer : new maptalks.TileLayer('tile',{
-                    'urlTemplate' : 'https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
-                    'subdomains'  : ['a','b','c','d']
+                    'urlTemplate' : 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    'subdomains'  : ['a','b','c']
                 })
                 /*layers : [
                     new maptalks.VectorLayer('v', [new maptalks.Marker([-123.10, 49.25])])
@@ -66,28 +67,20 @@ export default class Maptalks extends React.Component{
                 scene.add(light);
                 //...
                 data.features.forEach(function (g) {
-                    debugger;
-                    var heightPerLevel = 10;
-                    var levels = g.properties.growth*10 || 1;
+                    //var heightPerLevel = 10;
+                    var levels = g.properties.valuePerSqm/100 || 1;
                     let color;
-                    if (levels < 2) {
-                        color = 0x2685;
-                    } else if (levels >= 2 && levels <= 5) {
-                        color = 0xff57;
-                    } else {
-                        color = 0xff2e;
-                    }
-                    /*if (levels < 2) {
+                    if (levels < 40) {
                         color = "rgb(128, 247, 247)";
-                    } else if (levels >= 2 && levels <= 5) {
+                    } else if (levels >= 40 && levels <= 80) {
                         color = "rgb(20, 184, 247)";
                     } else {
                         color = "rgb(20, 58, 247)";
-                    }*/
+                    }
                     var m = new THREE.MeshPhongMaterial({color: color, opacity : 0.7});
                     //change to back side with THREE <= v0.94
                     // m.side = THREE.BackSide;
-                    var mesh = me.toExtrudeMesh(maptalks.GeoJSON.toGeometry(g), levels * heightPerLevel, m, levels * heightPerLevel);
+                    var mesh = me.toExtrudeMesh(maptalks.GeoJSON.toGeometry(g), levels, m, levels);
                     if (Array.isArray(mesh)) {
                         scene.add.apply(scene, mesh);
                     } else {
@@ -96,16 +89,6 @@ export default class Maptalks extends React.Component{
                 });
             };
             threeLayer.addTo(map);
-        }
-    }
-
-    _getColor(level) {
-        if (level < 2) {
-            return ffdeada7;
-        } else if (level >= 2 && level <= 5) {
-            return ffd700033;
-        } else {
-            return ffe4c400;
         }
     }
 }

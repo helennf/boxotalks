@@ -8,7 +8,6 @@ import { ThreeLayer } from 'maptalks.three';
 export default class MaptalksMap extends React.Component{
     //
     render() {
-        debugger;
         const map = new maptalks.Map('maptalks-container', {
             center: [0, 0],
             zoom: 1
